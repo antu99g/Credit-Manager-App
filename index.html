@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Credit Manager</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
+</head>
+<body>
+
+  <!-- ================= HOME SCREEN ================= -->
+  <div id="home-screen" class="screen active">
+    <div class="header">
+      <h2>Credit Manager</h2>
+    </div>
+    
+    <div class="tabs">
+      <button id="tab-w" class="tab active" onclick="switchTab('w')">Wholesalers</button>
+      <button id="tab-r" class="tab" onclick="switchTab('r')">Retailers</button>
+    </div>
+
+    <div id="customer-list" class="list-container">
+      <!-- Customer items will be injected here by JavaScript -->
+    </div>
+
+    <!-- Floating Action Button -->
+    <button id="add-customer-btn" class="fab" onclick="openAddCustomerModal()">+ Add Wholesaler</button>
+  </div>
+
+  <!-- ================= CUSTOMER DETAILS SCREEN ================= -->
+  <div id="details-screen" class="screen">
+    <div class="header">
+      <button class="back-btn" onclick="goBack()">&#8592; Back</button>
+      <div class="customer-info-header">
+        <h3 id="detail-name">Name</h3>
+        <p id="detail-mobile">Mobile</p>
+        <h2 id="detail-due" class="due-amount">₹ 0</h2>
+      </div>
+    </div>
+
+    <div id="transaction-list" class="list-container">
+      <!-- Transaction items will be injected here -->
+    </div>
+
+    <button class="fab" onclick="openAddTxnModal()">+ Add Txn</button>
+  </div>
+
+  <!-- ================= ADD CUSTOMER MODAL ================= -->
+  <div id="add-customer-modal" class="modal">
+    <div class="modal-content">
+      <h3 id="add-customer-title">Add Customer</h3>
+      <input type="text" id="new-cust-name" placeholder="Name (e.g. রহিম)">
+      <input type="tel" id="new-cust-mobile" placeholder="Mobile Number">
+      <div class="modal-actions">
+        <button class="cancel-btn" onclick="closeModals()">Cancel</button>
+        <button class="save-btn" onclick="saveCustomer()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= ADD TRANSACTION MODAL ================= -->
+  <div id="add-txn-modal" class="modal">
+    <div class="modal-content">
+      <h3>Add Transaction</h3>
+      <input type="number" id="new-txn-goods" placeholder="Goods Bought Amount (₹)">
+      <input type="number" id="new-txn-paid" placeholder="Paid Amount (₹)">
+      <div class="modal-actions">
+        <button class="cancel-btn" onclick="closeModals()">Cancel</button>
+        <button class="save-btn" onclick="saveTransaction()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Full-screen loading spinner -->
+  <div id="loader" class="loader-overlay hidden">
+    <div class="spinner"></div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
