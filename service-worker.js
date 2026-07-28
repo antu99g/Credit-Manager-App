@@ -1,4 +1,4 @@
-const CACHE_NAME = "credit-app-v2";
+const CACHE_NAME = "credit-app-v3"; // Bumped to version 3
 const ASSETS_TO_CACHE = [
   "./",
   "./index.html",
@@ -8,25 +8,49 @@ const ASSETS_TO_CACHE = [
   "./icon.png",
 ];
 
-// Install the service worker and cache files
+// Install: Force the new service worker to take over immediately
 self.addEventListener("install", (event) => {
+  self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS_TO_CACHE);
-    }),
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS_TO_CACHE)),
   );
 });
 
-// Serve cached files when offline, but let API calls pass through
+// Activate: Delete any old, outdated caches instantly
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    caches.keys().then((keys) => {
+      return Promise.all(
+        keys.map((key) => {
+          if (key !== CACHE_NAME) {
+            return caches.delete(key);
+          }
+        }),
+      );
+    }),
+  );
+  self.clients.claim();
+});
+
+// Fetch: "NETWORK FIRST" Strategy for 100% Accuracy
 self.addEventListener("fetch", (event) => {
-  // Ignore requests to Google Apps Script (we always want fresh data)
+  // Never intercept API calls to Google Sheets
   if (event.request.url.includes("script.google.com")) {
     return;
   }
 
   event.respondWith(
-    caches.match(event.request).then((response) => {
-      return response || fetch(event.request);
-    }),
+    fetch(event.request)
+      .then((networkResponse) => {
+        // If internet works, save the newest version and show it
+        return caches.open(CACHE_NAME).then((cache) => {
+          cache.put(event.request, networkResponse.clone());
+          return networkResponse;
+        });
+      })
+      .catch(() => {
+        // If offline (no internet), fall back to the last known cache
+        return caches.match(event.request);
+      }),
   );
 });

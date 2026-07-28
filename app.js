@@ -29,6 +29,7 @@ async function apiCall(action, data = {}) {
     const response = await fetch(API_URL, {
       method: "POST",
       headers: { "Content-Type": "text/plain;charset=utf-8" },
+      cache: "no-store",
       body: JSON.stringify({ action: action, ...data }),
     });
     return await response.json();
