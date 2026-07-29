@@ -75,7 +75,7 @@ function renderCustomerList() {
     let dateStr = "";
     if (cust.lastTransactionDate) {
       const dateObj = new Date(cust.lastTransactionDate);
-      dateStr = `Last Txn: ${dateObj.getDate()}/${dateObj.getMonth() + 1}/${dateObj.getFullYear()}`;
+      dateStr = `Last Transaction: ${dateObj.getDate()}/${dateObj.getMonth() + 1}/${dateObj.getFullYear()}`;
     } else {
       dateStr = "No transactions yet";
     }
