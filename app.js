@@ -71,10 +71,14 @@ function renderCustomerList() {
       cust.currentDue,
     );
 
-    // Check if mobile exists, otherwise don't show the span
-    const mobileHTML = cust.mobile
-      ? `<span>${cust.mobile}</span>`
-      : `<span></span>`;
+    // Format the last transaction date instead of showing mobile number
+    let dateStr = "";
+    if (cust.lastTransactionDate) {
+      const dateObj = new Date(cust.lastTransactionDate);
+      dateStr = `Last Txn: ${dateObj.getDate()}/${dateObj.getMonth() + 1}/${dateObj.getFullYear()}`;
+    } else {
+      dateStr = "No transactions yet";
+    }
 
     const card = document.createElement("div");
     card.className = `card ${bgColor}`;
@@ -83,7 +87,7 @@ function renderCustomerList() {
     card.innerHTML = `
       <h4>${cust.name}</h4>
       <div class="card-row">
-        ${mobileHTML}
+        <span style="color: #666; font-size: 13px;">${dateStr}</span>
         <span class="due-text">₹ ${cust.currentDue}</span>
       </div>
     `;
@@ -92,14 +96,15 @@ function renderCustomerList() {
 }
 
 function getDefaulterColor(lastTxnDate, currentDue) {
-  // FIX: If due is 0 OR they have never had a transaction, background is white
+  // If due is 0 OR they have never had a transaction, background is white
   if (currentDue <= 0 || !lastTxnDate) return "bg-white";
 
   const now = new Date().getTime();
   const daysOverdue = (now - lastTxnDate) / (1000 * 60 * 60 * 24);
 
-  if (daysOverdue >= 180) return "bg-red";
-  if (daysOverdue >= 90) return "bg-yellow";
+  // Updated time periods for defaulters
+  if (daysOverdue >= 365) return "bg-red"; // More than 1 year
+  if (daysOverdue >= 180) return "bg-yellow"; // More than 6 months
   return "bg-white";
 }
 
