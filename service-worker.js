@@ -1,4 +1,4 @@
-const CACHE_NAME = "credit-app-v3"; // Bumped to version 3
+const CACHE_NAME = "credit-app-v4";
 const ASSETS_TO_CACHE = [
   "./",
   "./index.html",
