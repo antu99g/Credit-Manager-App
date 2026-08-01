@@ -167,12 +167,16 @@ function renderTransactions(transactions) {
     const dateObj = new Date(txn.date);
     const dateStr = `${dateObj.getDate()}/${dateObj.getMonth() + 1}/${dateObj.getFullYear()}`;
 
-    // Only show payment method if there is paid amount and a method was saved
     let paidDisplay = `Paid: ₹ 0`;
     if (txn.paid > 0) {
       const methodStr = txn.paymentMethod ? `${txn.paymentMethod} ` : "";
       paidDisplay = `<span style="color: green; font-weight: bold;">${methodStr}₹ ${txn.paid}</span>`;
     }
+
+    // Only create the remarks HTML if the user actually typed something
+    const remarksHTML = txn.remarks
+      ? `<div style="color: #777; font-size: 13px; margin-top: 8px; font-style: italic;">Note: ${txn.remarks}</div>`
+      : "";
 
     const card = document.createElement("div");
     card.className = "card bg-white";
@@ -185,6 +189,7 @@ function renderTransactions(transactions) {
         <span>Goods: ₹ ${txn.goods}</span>
         ${paidDisplay}
       </div>
+      ${remarksHTML} 
     `;
     listContainer.appendChild(card);
   });
@@ -207,6 +212,7 @@ function openAddTxnModal() {
   document.getElementById("new-txn-goods").value = "";
   document.getElementById("new-txn-paid").value = "";
   document.getElementById("new-txn-method").value = "Cash"; // Reset default
+  document.getElementById("new-txn-remarks").value = ""; // Reset remarks
   document.getElementById("add-txn-modal").classList.add("active");
 }
 
@@ -237,6 +243,7 @@ async function saveTransaction() {
   const goods = document.getElementById("new-txn-goods").value || 0;
   const paid = document.getElementById("new-txn-paid").value || 0;
   const method = document.getElementById("new-txn-method").value;
+  const remarks = document.getElementById("new-txn-remarks").value.trim(); // Get remarks
 
   if (goods == 0 && paid == 0) return alert("Please enter an amount.");
 
@@ -249,16 +256,15 @@ async function saveTransaction() {
       goods: goods,
       paid: paid,
       paymentMethod: method,
+      remarks: remarks, // Send remarks to backend
     },
   });
 
   if (response.status === "success") {
-    // FIX: Update local UI state INSTANTLY
     currentCustomer.currentDue = response.data.newDue;
     currentCustomer.lastTransactionDate = new Date().getTime();
-    updateCustomerHeaderUI(); // Update the big number at the top immediately
+    updateCustomerHeaderUI();
 
-    // Reload just the transaction list to show the new one
     const txnsResponse = await apiCall("getTransactions", {
       customerId: currentCustomer.customerId,
     });
